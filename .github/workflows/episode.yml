@@ -1,0 +1,32 @@
+name: Gerar episódio
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar ferramentas gratuitas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Gerar vídeo
+        run: python episode.py
+      - name: Disponibilizar episódio
+        uses: actions/upload-artifact@v4
+        with:
+          name: episodio-o-misterio-da-estrela-perdida
+          path: O_Misterio_da_Estrela_Perdida.mp4
+          retention-days: 7
